@@ -1,4 +1,5 @@
 
+
 import logging
 from logging.handlers import RotatingFileHandler
 
@@ -10,6 +11,7 @@ from flask.ext.wtf import CSRFProtect
 from redis import StrictRedis
 
 from config import config
+from info.modules.index import index_blu
 
 # 初始化数据库
 #  在Flask很多扩展里面都可以先初始化扩展的对象，然后再去调用 init_app 方法去初始化
@@ -45,5 +47,8 @@ def create_app(config_name):
     # 设置session保存指定位置
     Session(app)
 
-    return app
 
+    # 注册蓝图
+    app.register_blueprint(index_blu)
+
+    return app
