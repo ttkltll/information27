@@ -1,11 +1,7 @@
 
-import logging
-
-from flask import current_app
-from flask import session
 from flask_script import Manager
 from flask_migrate import Migrate, MigrateCommand
-from info import create_app, db
+from info import create_app, db, models
 
 # manage.py是程序启动的入口，只关心启动的相关参数以及内容，不关心具体该
 # 如果创建app或者相关业务逻辑
