@@ -4,7 +4,7 @@ $(function(){
 	$('.login_btn').click(function(){
         $('.login_form_con').show();
 	})
-	
+
 	// 点击关闭按钮关闭登录框或者注册框
 	$('.shutoff').click(function(){
 		$(this).closest('form').hide();
@@ -72,7 +72,7 @@ $(function(){
 	var sHash = window.location.hash;
 	if(sHash!=''){
 		var sId = sHash.substring(1);
-		var oNow = $('.'+sId);		
+		var oNow = $('.'+sId);
 		var iNowIndex = oNow.index();
 		$('.option_list li').eq(iNowIndex).addClass('active').siblings().removeClass('active');
 		oNow.show().siblings().hide();
@@ -150,9 +150,14 @@ $(function(){
 
 var imageCodeId = ""
 
-// TODO 生成一个图片验证码的编号，并设置页面中图片验证码img标签的src属性
+// 生成一个图片验证码的编号，并设置页面中图片验证码img标签的src属性
 function generateImageCode() {
-
+    // 浏览器要发起图片验证码请求/image_code?imageCodeId=xxxxx
+    imageCodeId = generateUUID()
+    // 生成 url
+    var url = "/image_code?imageCodeId=" + imageCodeId
+    // 给指定img标签设置src,设置了地址之后，img标签就会去向这个地址发起请求，请求图片
+    $(".get_pic_code").attr("src", url)
 }
 
 // 发送短信验证码
