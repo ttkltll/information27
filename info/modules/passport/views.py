@@ -29,9 +29,10 @@ def send_sms_code():
     7. 告知发送结果
     :return:
     """
+
     '{"mobiel": "18811111111", "image_code": "AAAA", "image_code_id": "u23jksdhjfkjh2jh4jhdsj"}'
     # 1. 获取参数：手机号，图片验证码内容，图片验证码的编号 (随机值)
-    # params_dict = json.loads(request.data)
+     #params_dict = json.loads(request.data)
     params_dict = request.json
 
     mobile = params_dict.get("mobile")
@@ -80,7 +81,6 @@ def send_sms_code():
 
     # 7. 告知发送结果
     return jsonify(errno=RET.OK, errmsg="发送成功")
-
 
 @passport_blu.route('/image_code')
 def get_image_code():

@@ -1,14 +1,14 @@
 $(function(){
 
-	// 打开登录框
-	$('.login_btn').click(function(){
+    // 打开登录框
+    $('.login_btn').click(function(){
         $('.login_form_con').show();
-	})
+    })
 
-	// 点击关闭按钮关闭登录框或者注册框
-	$('.shutoff').click(function(){
-		$(this).closest('form').hide();
-	})
+    // 点击关闭按钮关闭登录框或者注册框
+    $('.shutoff').click(function(){
+        $(this).closest('form').hide();
+    })
 
     // 隐藏错误
     $(".login_form #mobile").focus(function(){
@@ -32,66 +32,66 @@ $(function(){
     });
 
 
-	// 点击输入框，提示文字上移
-	$('.form_group').on('click focusin',function(){
-		$(this).children('.input_tip').animate({'top':-5,'font-size':12},'fast').siblings('input').focus().parent().addClass('hotline');
-	})
+    // 点击输入框，提示文字上移
+    $('.form_group').on('click focusin',function(){
+        $(this).children('.input_tip').animate({'top':-5,'font-size':12},'fast').siblings('input').focus().parent().addClass('hotline');
+    })
 
-	// 输入框失去焦点，如果输入框为空，则提示文字下移
-	$('.form_group input').on('blur focusout',function(){
-		$(this).parent().removeClass('hotline');
-		var val = $(this).val();
-		if(val=='')
-		{
-			$(this).siblings('.input_tip').animate({'top':22,'font-size':14},'fast');
-		}
-	})
-
-
-	// 打开注册框
-	$('.register_btn').click(function(){
-		$('.register_form_con').show();
-		generateImageCode()
-	})
+    // 输入框失去焦点，如果输入框为空，则提示文字下移
+    $('.form_group input').on('blur focusout',function(){
+        $(this).parent().removeClass('hotline');
+        var val = $(this).val();
+        if(val=='')
+        {
+            $(this).siblings('.input_tip').animate({'top':22,'font-size':14},'fast');
+        }
+    })
 
 
-	// 登录框和注册框切换
-	$('.to_register').click(function(){
-		$('.login_form_con').hide();
-		$('.register_form_con').show();
+    // 打开注册框
+    $('.register_btn').click(function(){
+        $('.register_form_con').show();
         generateImageCode()
-	})
+    })
 
-	// 登录框和注册框切换
-	$('.to_login').click(function(){
-		$('.login_form_con').show();
-		$('.register_form_con').hide();
-	})
 
-	// 根据地址栏的hash值来显示用户中心对应的菜单
-	var sHash = window.location.hash;
-	if(sHash!=''){
-		var sId = sHash.substring(1);
-		var oNow = $('.'+sId);
-		var iNowIndex = oNow.index();
-		$('.option_list li').eq(iNowIndex).addClass('active').siblings().removeClass('active');
-		oNow.show().siblings().hide();
-	}
+    // 登录框和注册框切换
+    $('.to_register').click(function(){
+        $('.login_form_con').hide();
+        $('.register_form_con').show();
+        generateImageCode()
+    })
 
-	// 用户中心菜单切换
-	var $li = $('.option_list li');
-	var $frame = $('#main_frame');
+    // 登录框和注册框切换
+    $('.to_login').click(function(){
+        $('.login_form_con').show();
+        $('.register_form_con').hide();
+    })
 
-	$li.click(function(){
-		if($(this).index()==5){
-			$('#main_frame').css({'height':900});
-		}
-		else{
-			$('#main_frame').css({'height':660});
-		}
-		$(this).addClass('active').siblings().removeClass('active');
-		$(this).find('a')[0].click()
-	})
+    // 根据地址栏的hash值来显示用户中心对应的菜单
+    var sHash = window.location.hash;
+    if(sHash!=''){
+        var sId = sHash.substring(1);
+        var oNow = $('.'+sId);
+        var iNowIndex = oNow.index();
+        $('.option_list li').eq(iNowIndex).addClass('active').siblings().removeClass('active');
+        oNow.show().siblings().hide();
+    }
+
+    // 用户中心菜单切换
+    var $li = $('.option_list li');
+    var $frame = $('#main_frame');
+
+    $li.click(function(){
+        if($(this).index()==5){
+            $('#main_frame').css({'height':900});
+        }
+        else{
+            $('#main_frame').css({'height':660});
+        }
+        $(this).addClass('active').siblings().removeClass('active');
+        $(this).find('a')[0].click()
+    })
 
     // TODO 登录表单提交
     $(".login_form_con").submit(function (e) {
@@ -118,12 +118,12 @@ $(function(){
         // 阻止默认提交操作
         e.preventDefault()
 
-		// 取到用户输入的内容
+        // 取到用户输入的内容
         var mobile = $("#register_mobile").val()
         var smscode = $("#smscode").val()
         var password = $("#register_password").val()
 
-		if (!mobile) {
+        if (!mobile) {
             $("#register-mobile-err").show();
             return;
         }
@@ -137,14 +137,11 @@ $(function(){
             return;
         }
 
-		if (password.length < 6) {
+        if (password.length < 6) {
             $("#register-password-err").html("密码长度不能少于6位");
             $("#register-password-err").show();
             return;
         }
-
-        // 发起注册请求
-
     })
 })
 
@@ -179,7 +176,53 @@ function sendSMSCode() {
         return;
     }
 
-    // TODO 发送短信验证码
+    // 发送短信验证码
+    var params = {
+        "mobile": mobile,
+        "image_code":imageCode,
+        "image_code_id": imageCodeId
+    }
+
+    // 发起注册请求
+    $.ajax({
+        // 请求地址
+        url: "/passport/sms_code",
+        // 请求方式
+        type: "post",
+        // 请求参数
+        data: JSON.stringify(params),
+        // 请求参数的数据类型
+        contentType: "application/json",
+        success: function (response) {
+            if (response.errno == "0") {
+                // 代表发送成功
+                var num = 60
+                var t = setInterval(function () {
+
+                    if (num == 1) {
+                        // 代表倒计时结束
+                        // 清除倒计时
+                        clearInterval(t)
+
+                        // 设置显示内容
+                        $(".get_code").html("点击获取验证码")
+                        // 添加点击事件
+                        $(".get_code").attr("onclick", "sendSMSCode();");
+                    }else {
+                        num -= 1
+                        // 设置 a 标签显示的内容
+                        $(".get_code").html(num + "秒")
+                    }
+                }, 1000)
+            }else {
+                // 代表发送失败
+                alert(response.errmsg)
+                $(".get_code").attr("onclick", "sendSMSCode();");
+            }
+        }
+
+    })
+
 }
 
 // 调用该函数模拟点击左侧按钮
@@ -195,8 +238,8 @@ function fnChangeMenu(n) {
 // 一般页面的iframe的高度是660
 // 新闻发布页面iframe的高度是900
 function fnSetIframeHeight(num){
-	var $frame = $('#main_frame');
-	$frame.css({'height':num});
+    var $frame = $('#main_frame');
+    $frame.css({'height':num});
 }
 
 function getCookie(name) {
