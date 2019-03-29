@@ -64,21 +64,23 @@ def register():
     user.nick_name = mobile
     # 记录用户最后一次登录时间
     user.last_login = datetime.now()
-    # TODO 对密码做处理
+    # 对密码做处理
+    # 需求：在设置 password 的时候，去对 password 进行加密，并且将加密结果给 user.password_hash 赋值
+    user.password = password
 
-    # # 6. 添加到数据库
-    # try:
-    #     db.session.add(user)
-    #     db.session.commit()
-    # except Exception as e:
-    #     current_app.logger.error(e)
-    #     db.session.rollback()
-    #     return jsonify(errno=RET.DBERR, errmsg="数据保存失败")
-    #
-    # # 往 session 中保存数据表示当前已经登录
-    # session["user_id"] = user.id
-    # session["mobile"] = user.mobile
-    # session["nick_name"] = user.nick_name
+    # 6. 添加到数据库
+    try:
+        db.session.add(user)
+        db.session.commit()
+    except Exception as e:
+        current_app.logger.error(e)
+        db.session.rollback()
+        return jsonify(errno=RET.DBERR, errmsg="数据保存失败")
+
+    # 往 session 中保存数据表示当前已经登录
+    session["user_id"] = user.id
+    session["mobile"] = user.mobile
+    session["nick_name"] = user.nick_name
 
     # 7. 返回响应
     return jsonify(errno=RET.OK, errmsg="注册成功")
