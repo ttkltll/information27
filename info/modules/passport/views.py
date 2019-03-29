@@ -66,7 +66,6 @@ def login():
     return jsonify(errno=RET.OK, errmsg="登录成功")
 
 
-
 @passport_blu.route('/register', methods=["POST"])
 def register():
     """
