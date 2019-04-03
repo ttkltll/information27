@@ -25,3 +25,6 @@ else:return response
 登录的时候，拿用户输入的信息，电话号码去数据库里查有没有这个人，如果有的话，把这个人的资料提取出来，存放在redis里的session中。
 为什么不从数据库里取，因为这样没有登录也会出现用户头像信息，但如果session里有值，说明是登录状态 ，比如浏览器没有关掉或者没有越过session的过期时间。
 用户在注册和登录的时候 ，都会设置session的值。
+
+a = math.sqrt(d)
+a = make_response()

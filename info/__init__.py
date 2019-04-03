@@ -11,9 +11,7 @@ from redis import StrictRedis
 
 from config import config
 
-# 初始化数据库
-#  在Flask很多扩展里面都可以先初始化扩展的对象，然后再去调用 init_app 方法去初始化
-from info.utils.common import do_index_class
+
 
 db = SQLAlchemy()
 
@@ -54,6 +52,10 @@ def create_app(config_name):
     CSRFProtect(app)
     # 设置session保存指定位置
     Session(app)
+
+    # 初始化数据库
+    #  在Flask很多扩展里面都可以先初始化扩展的对象，然后再去调用 init_app 方法去初始化
+    from info.utils.common import do_index_class
     # 添加自定义过滤器
     app.add_template_filter(do_index_class, "index_class")
 
