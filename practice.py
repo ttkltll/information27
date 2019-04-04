@@ -28,3 +28,20 @@ else:return response
 
 a = math.sqrt(d)
 a = make_response()
+
+
+### 点收藏逻辑是怎么实现的？
+排行榜的实现，后端通过从数据库拿到新闻的数据，然后通过试图函数，拼接模板语言，返回给首页
+而收藏呢？在后端实现什么呢？用户和新闻之间的关系？
+
+一个是进入详情页，这个时候有拿到了新闻的id,在后端数据库里设置news.click+1,到数据库里找到这条详细的新闻数据并且渲染，拿到当前登录用户，判断这条新闻有没有在user.collection里，if news in collection数组里。如果在，就把前端渲染成已收藏的图标，如果不在，渲染成收藏的图标。这个可以通过模板的if else来做判断，这个都是在详情页视图函数中实现的
+
+    而把这篇文章收藏，或者取消收藏。则要别外一个视图函数来完成，点击"收藏按钮",那么就发送了一个请求，这个请求里带着新闻的id,还有这个按钮的收藏状态"not collected",这两个参数通过javascript来实现，把按钮的属性给给一个变量id,自已定义一个变量action = not collected ,通过json传给视图函数，视图函数拿到这两个参数，先得到request对象的json参数，然后用Id去数据库里找出这条新闻，再根据现在登录的用户，user = g.user ，把这条新闻增加到user.collection中，user.collection_news.add(news),如果成功的话，返回json给ajax，ajax根据增加成功，操作前端的按钮状态。变成"已收藏"。
+
+
+###评论是怎么实现的？
+哪个用户的评论，哪篇文章的评论。一进入文章详情页，就能拿到这文章的id看这id有哪些用户评论，通过用户，拿到这个id这个用户的评论显示出来。
+
+
+### 评论，怎么实现的？
+在一个专门的评论视图函数中实现。通过json静态刷新。把用户id,里面的value，通过json传给视图函数。如果得到id,value呢？submit，取出value值，id的值。给两个变量。这时是json对象，在视图函数中，通过request.json()来接收参数，给两个亦是a,b。视图函数拿到后，comment.用户id,comment.文章id,。new.comments.content = value,完成后返回状态给json，json根据是否成功操作javascrip来控制这条评论显示在最上方。
