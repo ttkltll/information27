@@ -14,10 +14,6 @@ from . import index_blu
 
 @index_blu.route('/news_list')
 def news_list():
-    """
-    获取首页新闻数据
-    :return:
-    """
 
     # 1. 获取参数
     # 新闻的分类id
@@ -36,7 +32,6 @@ def news_list():
 
     filters = []
     if cid != 1:  # 查询的不是最新的数据
-        # 需要添加条件
         filters.append(News.category_id == cid)
 
     # 3. 查询数据
@@ -46,12 +41,10 @@ def news_list():
         current_app.logger.error(e)
         return jsonify(errno=RET.DBERR, errmsg="数据查询错误")
 
-    # 取到当前页的数据
     news_model_list = paginate.items  # 模型对象列表
     total_page = paginate.pages
     current_page = paginate.page
 
-    # 将模型对象列表转成字典列表
     news_dict_li = []
     for news in news_model_list:
         news_dict_li.append(news.to_basic_dict())
@@ -68,21 +61,6 @@ def news_list():
 @index_blu.route('/')
 @user_login_data
 def index():
-    """
-    显示首页
-    1. 如果用户已经登录，将当前登录用户的数据传到模板中，供模板显示
-    :return:
-    """
-    # 显示用户是否登录的逻辑
-    # 取到用户id
-    # user_id = session.get("user_id", None)
-    # user = None
-    # if user_id:
-    #     # 尝试查询用户的模型
-    #     try:
-    #         user = User.query.get(user_id)
-    #     except Exception as e:
-    #         current_app.logger.error(e)
 
     user = g.user
 
