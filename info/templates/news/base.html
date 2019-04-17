@@ -48,20 +48,22 @@
 
     {% endblock %}
 
-    <div class="rank_con fr">
-        {% block authorBlock %}
+    {% block rankBlock %}
+        <div class="rank_con fr">
+            {% block authorBlock %}
 
-        {% endblock %}
+            {% endblock %}
 
-        <div class="rank_title">
-            <h3>点击排行</h3>
+            <div class="rank_title">
+                <h3>点击排行</h3>
+            </div>
+            <ul class="rank_list">
+                {% for news in data.news_dict_li %}
+                    <li><span class="{{ loop.index0 | index_class }}">{{ loop.index }}</span><a href="#">{{ news.title }}</a></li>
+                {% endfor %}
+            </ul>
         </div>
-        <ul class="rank_list">
-            {% for news in data.news_dict_li %}
-                <li><span class="{{ loop.index0 | index_class }}">{{ loop.index }}</span><a href="#">{{ news.title }}</a></li>
-            {% endfor %}
-        </ul>
-    </div>
+    {% endblock %}
 
 </div>
 <div class="footer">
@@ -75,7 +77,7 @@
         <a href="">友情链接</a>
     </div>
     <p class="copyright">
-        CopyRight © 2018 小猪猫信息技术有限公司 All Rights Reserved<br />
+        CopyRight © 2018 新经资讯信息技术有限公司 All Rights Reserved<br />
         电话：010-****888    京ICP备*******8号
     </p>
 </div>
