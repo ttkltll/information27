@@ -17,7 +17,7 @@ $(function () {
         });
         // 取到两次密码进行判断
         var new_password = params["new_password"];
-        var new_password2 = params["new_password2];
+        var new_password2 = params["new_password2"];
 
         if (new_password != new_password2) {
             alert('两次密码输入不一致')
