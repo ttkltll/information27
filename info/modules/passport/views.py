@@ -28,6 +28,8 @@ def logout():
     session.pop('user_id', None)
     session.pop('mobile', None)
     session.pop('nick_name', None)
+    # 要清楚is_admin的值，如果不清除，先登录管理员，会保存到session，再登录普通用户，又能访问管理员页面
+    session.pop('is_admin', None)
 
     return jsonify(errno=RET.OK, errmsg="退出成功")
 
@@ -77,7 +79,18 @@ def login():
     session["mobile"] = user.mobile
     session["nick_name"] = user.nick_name
 
+    # 设置当前用户最后一次登录的时间
     user.last_login = datetime.now()
+
+    # 如果在视图函数中，对模型身上的属性有修改，那么需要commit到数据库保存
+    # 但是其实可以不用自己去写 db.session.commit(),前提是对SQLAlchemy有过相关配置
+
+    # try:
+    #     db.session.commit()
+    # except Exception as e:
+    #     db.session.rollback()
+    #     current_app.logger.error(e)
+
     # 5. 响应
     return jsonify(errno=RET.OK, errmsg="登录成功")
 
@@ -127,6 +140,7 @@ def register():
     user.mobile = mobile
     # 暂时没有昵称 ，使用手机号代替
     user.nick_name = mobile
+    # 记录用户最后一次登录时间
     user.last_login = datetime.now()
     # 对密码做处理
     # 需求：在设置 password 的时候，去对 password 进行加密，并且将加密结果给 user.password_hash 赋值
@@ -141,6 +155,7 @@ def register():
         db.session.rollback()
         return jsonify(errno=RET.DBERR, errmsg="数据保存失败")
 
+    # 往 session 中保存数据表示当前已经登录
     session["user_id"] = user.id
     session["mobile"] = user.mobile
     session["nick_name"] = user.nick_name
@@ -151,7 +166,17 @@ def register():
 
 @passport_blu.route('/sms_code', methods=["POST"])
 def send_sms_code():
-
+    """
+    发送短信的逻辑
+    1. 获取参数：手机号，图片验证码内容，图片验证码的编号 (随机值)
+    2. 校验参数(参数是否符合规则，判断是否有值)
+    3. 先从redis中取出真实的验证码内容
+    4. 与用户的验证码内容进行对比，如果对比不一致，那么返回验证码输入错误
+    5. 如果一致，生成验证码的内容(随机数据)
+    6. 发送短信验证码
+    7. 告知发送结果
+    :return:
+    """
 
     '{"mobiel": "18811111111", "image_code": "AAAA", "image_code_id": "u23jksdhjfkjh2jh4jhdsj"}'
     # 1. 获取参数：手机号，图片验证码内容，图片验证码的编号 (随机值)
