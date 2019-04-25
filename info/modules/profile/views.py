@@ -12,6 +12,48 @@ from info.utils.image_storage import storage
 from info.utils.response_code import RET
 
 
+@profile_blu.route('/user_follow')
+@user_login_data
+def user_follow():
+    # 获取页数
+    p = request.args.get("p", 1)
+    try:
+        p = int(p)
+    except Exception as e:
+        current_app.logger.error(e)
+        p = 1
+
+    # 取到当前登录用户
+    user = g.user
+
+    follows = []
+    current_page = 1
+    total_page = 1
+    try:
+        paginate = user.followed.paginate(p, constants.USER_FOLLOWED_MAX_COUNT, False)
+        # 获取当前页数据
+        follows = paginate.items
+        # 获取当前页
+        current_page = paginate.page
+        # 获取总页数
+        total_page = paginate.pages
+    except Exception as e:
+        current_app.logger.error(e)
+
+    user_dict_li = []
+
+    for follow_user in follows:
+        user_dict_li.append(follow_user.to_dict())
+
+    data = {
+        "users": user_dict_li,
+        "total_page": total_page,
+        "current_page": current_page
+    }
+
+    return render_template('news/user_follow.html', data=data)
+
+
 @profile_blu.route('/news_list')
 @user_login_data
 def user_news_list():
@@ -99,12 +141,20 @@ def news_release():
         return jsonify(errno=RET.PARAMERR, errmsg="参数有误")
 
     # 3.取到图片，将图片上传到七牛云
+    try:
+        index_image_data = index_image.read()
+        # 上传到七牛云
+        key = storage(index_image_data)
+    except Exception as e:
+        current_app.logger.error(e)
+        return jsonify(errno=RET.PARAMERR, errmsg="参数有误")
 
     news = News()
     news.title = title
     news.digest = digest
     news.source = source
     news.content = content
+    news.index_image_url = constants.QINIU_DOMIN_PREFIX + key
     news.category_id = category_id
     news.user_id = g.user.id
     # 1代表待审核状态
