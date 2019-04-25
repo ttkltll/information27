@@ -3,6 +3,8 @@ from logging.handlers import RotatingFileHandler
 
 from flask import Flask
 # 可以用来指定 session 保存的位置
+from flask import g
+from flask import render_template
 from flask.ext.session import Session
 from flask.ext.sqlalchemy import SQLAlchemy
 from flask.ext.wtf import CSRFProtect
@@ -11,12 +13,12 @@ from redis import StrictRedis
 
 from config import config
 
-
-
 db = SQLAlchemy()
 
 # https://www.cnblogs.com/xieqiankun/p/type_hints_in_python3.html
 redis_store = None  # type: StrictRedis
+
+
 # redis_store: StrictRedis = None
 
 
@@ -44,7 +46,8 @@ def create_app(config_name):
     db.init_app(app)
     # 初始化 redis 存储对象
     global redis_store
-    redis_store = StrictRedis(host=config[config_name].REDIS_HOST, port=config[config_name].REDIS_PORT, decode_responses=True)
+    redis_store = StrictRedis(host=config[config_name].REDIS_HOST, port=config[config_name].REDIS_PORT,
+                              decode_responses=True)
     # 开启当前项目 CSRF 保护，只做服务器验证功能
     # 帮我们做了：从cookie中取出随机值，从表单中取出随机，然后进行校验，并且响应校验结果
     # 我们需要做：1. 在返回响应的时候，往cookie中添加一个csrf_token，2. 并且在表单中添加一个隐藏的csrf_token
@@ -58,6 +61,15 @@ def create_app(config_name):
     from info.utils.common import do_index_class
     # 添加自定义过滤器
     app.add_template_filter(do_index_class, "index_class")
+
+    from info.utils.common import user_login_data
+
+    @app.errorhandler(404)
+    @user_login_data
+    def page_not_fount(e):
+        user = g.user
+        data = {"user": user.to_dict() if user else None}
+        return render_template('news/404.html', data=data)
 
     @app.after_request
     def after_request(response):
